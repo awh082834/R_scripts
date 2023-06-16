@@ -1,0 +1,61 @@
+---
+title: "Ashe Report"
+output: pdf_document
+params:
+  bandage: default
+  plasmid: default
+  amr: default
+  sample: default
+  metrics: default
+  workDir: default
+---
+
+```{r, setup,include=FALSE}
+knitr::opts_knit$set(root.dir = params$workDir)
+```
+
+
+```{r load-packages, includes=FALSE, echo=FALSE}
+library(knitr)
+library(kableExtra)
+```
+
+# Sample Metrics
+```{r echo=FALSE}
+metrics <- read.csv(params$metrics, header = TRUE,sep = "\t")
+metrics2 <- subset(metrics, Sample == params$sample)
+metrics2 <- t(metrics2)
+knitr::kable(metrics2)
+```
+
+# AMR Data
+```{r echo=FALSE}
+data <- read.csv(params$amr,header=TRUE,sep = "\t")
+names(data) <- c('prot','contig','start','stop','strand','gene'
+   ,'seq','scope','type',
+  'subtype','class','subclass','method','targ_len','ref_len',
+   'cov','ident','aln_len','acc','closest','hmmID','hmmDes')
+data2 <- subset(data, select = -c(prot,scope,type,subtype,subclass,method,
+  targ_len,ref_len,cov,ident,aln_len,acc,hmmID,hmmDes,class,closest))
+knitr::kable(data2) %>% kable_styling(full_width = T)
+```
+
+# Bandage Plot
+```{r echo = FALSE, error = FALSE, out.width="50%", fig.align="center"}
+temp <- params$bandage
+options(knitr.graphics.error = FALSE)
+knitr::include_graphics(temp)
+```
+
+# Plasmid Data
+```{r echo=FALSE, out.width="150%", eval = FALSE}
+plas <- read.csv(params$plasmid,header = TRUE,sep = "\t")
+names(plas) <- c('sample','contigs','size','gc','md5','repType','repTypeAcc','relaxase','relaxAcc',
+  'mpf','mpfAcc','orit','oritAcc','mobility','closestMash','distance','id','clusterPri','clusterSec',
+  'predHostRange1','predHostRange2','predHostRange3','obsHostRange','repHostRange','repHostRange2','assocPlas')
+plas$sample <- gsub(".*\\:", "", plas$sample)
+plas2 <- subset(plas, select = -c(md5,repType,repTypeAcc,relaxAcc,mpfAcc,distance,
+  id, clusterPri,clusterSec,predHostRange1,predHostRange2, predHostRange3, obsHostRange,
+  repHostRange,repHostRange2,assocPlas,orit,oritAcc))
+knitr::kable(plas2) %>% kable_styling(full_width = T) 
+```

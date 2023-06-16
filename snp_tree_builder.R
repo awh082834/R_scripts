@@ -1,5 +1,6 @@
 library(ape)
 library(data.table)
+args = commandArgs(trailingOnly = TRUE)
 
 data <- read.table("path",header = TRUE , sep = "\t")
 data2 <- setNames(data.frame(t(data[ , - 1])), data[ , 1])
